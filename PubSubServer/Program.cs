@@ -1,4 +1,19 @@
-$HEADER$namespace $NAMESPACE$
+using System;
+
+namespace PubSubServer
 {
-  public class $CLASS$ {$END$}
+    public class Program
+    {
+        public static void Main()
+        {
+            Console.WriteLine("QQQ");
+//            var server = new Server();
+
+            var subscriberService = new SubscriberService();
+            subscriberService.StartSubscriberService();
+
+            var publisherService = new PublisherService();
+            publisherService.StartPublisherService();
+        }
+    }
 }
