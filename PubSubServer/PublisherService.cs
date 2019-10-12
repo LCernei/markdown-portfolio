@@ -43,11 +43,6 @@ namespace PubSubServer
                 }
 
             }
-            if (ipV4 == null)
-            {
-                Console.WriteLine("You have no IP of Version 4.Server can not run without it");
-                Environment.Exit(-1);
-            }
             return ipV4;
         }
 
@@ -73,13 +68,14 @@ namespace PubSubServer
                         var eventParts = new List<string>(messageParts);
                         eventParts.RemoveRange(0, 1);
                         var message = MakeCommaSeparatedString(eventParts);
+                            Console.WriteLine(message);
                         var subscriberListForThisTopic = Filter.GetSubscribers(topicName);
                         var workerThreadParameters = new WorkerThreadParameters();
                         workerThreadParameters.Server = server;
                         workerThreadParameters.Message = message;
                         workerThreadParameters.SubscriberListForThisTopic = subscriberListForThisTopic;
 
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(Publish), workerThreadParameters);
+                        ThreadPool.QueueUserWorkItem(Publish, workerThreadParameters);
                     }
                 }
                 catch(Exception exception)
