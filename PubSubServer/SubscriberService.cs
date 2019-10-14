@@ -7,60 +7,45 @@ using System.Threading;
 
 namespace PubSubServer
 {
-    class SubscriberService
+    // receive subscribe and unsubscribe commands
+    public class SubscriberService
     {
-
         public void StartSubscriberService()
         {
-            var th = new Thread(new ThreadStart(HostSubscriberService));
+            var th = new Thread(HostSubscriberService);
             th.IsBackground = false;
             th.Start();
         }
 
         private void HostSubscriberService()
         {
-            Console.WriteLine("Host Subscriber");
-
-            var ipV4 = IPAddress.Parse("127.0.0.1");// ReturnMachineIP(); if you need machine ip then use this method.The method is available in PublishService.cs            
-
+            var ipV4 = IPAddress.Parse("127.0.0.1");
             var localEP = new IPEndPoint(ipV4, 10001);
             var server = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             server.Bind(localEP);
-
             StartListening(server);
         }
 
         private static void StartListening(Socket server)
         {
-            EndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
-            var recv = 0;
-            var data = new byte[1024];
             while (true)
             {
-                recv = 0;
-                data = new byte[1024];
-                recv = server.ReceiveFrom(data, ref remoteEP);
-                var messageSendFromClient = Encoding.ASCII.GetString(data, 0, recv);
-                var messageParts = messageSendFromClient.Split(",".ToCharArray());
-
-                if (!string.IsNullOrEmpty(messageParts[0]))
+                var data = new byte[1024];
+                EndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
+                var recv = server.ReceiveFrom(data, ref remoteEP);
+                var receivedMessage = Encoding.ASCII.GetString(data, 0, recv);
+                var messageParts = receivedMessage.Trim().Split(",");
+                Console.WriteLine(receivedMessage + "|" + remoteEP);
+                if (messageParts.Length < 2)
+                    return;
+                var command = messageParts[0];
+                var topic = messageParts[1];
+                if (!string.IsNullOrEmpty(command) && !string.IsNullOrEmpty(topic))
                 {
-                    switch (messageParts[0])
-                    {
-                        case "Subscribe":
-                            if (!string.IsNullOrEmpty(messageParts[1]))
-                            {
-                                Filter.AddSubscriber(messageParts[1], remoteEP);
-                            }
-                            break;
-                        
-                        case "UnSubscribe":
-                            if (!string.IsNullOrEmpty(messageParts[1]))
-                            {
-                                Filter.RemoveSubscriber(messageParts[1], remoteEP);
-                            }
-                            break;
-                    }
+                    if (command == "Subscribe")
+                        Filter.AddSubscriber(topic, remoteEP);
+                    if (command == "UnSubscribe")
+                        Filter.RemoveSubscriber(topic, remoteEP);
                 }
             }
         }

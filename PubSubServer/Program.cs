@@ -6,9 +6,6 @@ namespace PubSubServer
     {
         public static void Main()
         {
-            Console.WriteLine("QQQ");
-//            var server = new Server();
-
             var subscriberService = new SubscriberService();
             subscriberService.StartSubscriberService();
 
