@@ -8,7 +8,6 @@ defmodule Excalibur.MixProject do
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      escript: escript()
     ]
   end
 
@@ -17,10 +16,6 @@ defmodule Excalibur.MixProject do
     [
       extra_applications: [:logger]
     ]
-  end
-
-  defp escript do
-    [main_module: Excalibur.MixProject]
   end
 
   # Run "mix help deps" to learn about dependencies.

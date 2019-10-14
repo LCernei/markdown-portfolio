@@ -1,6 +1,7 @@
 ﻿﻿using System;
 using System.Collections.Generic;
-using System.Text;
+ using System.IO;
+ using System.Text;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -43,9 +44,42 @@ namespace PubSubServer
                 if (!string.IsNullOrEmpty(command) && !string.IsNullOrEmpty(topic))
                 {
                     if (command == "Subscribe")
+                    {
                         Filter.AddSubscriber(topic, remoteEP);
-                    if (command == "UnSubscribe")
+                        CheckFile(topic, server, remoteEP);
+                    }
+                    else if (command == "UnSubscribe")
                         Filter.RemoveSubscriber(topic, remoteEP);
+                }
+            }
+        }
+
+        private static void CheckFile(string topic, Socket server, EndPoint remoteEp)
+        {
+            string path = @"./tempdata.txt";
+            bool fileChanged = false;
+            if (!File.Exists(path))
+                return;
+            var lines = File.ReadLines(path);
+            var newLines = new List<string>(lines);
+            foreach (var line in lines)
+            {
+                var lineParts = line.Split(",");
+                var lineTopic = lineParts[0];
+                if (lineTopic == topic)
+                {
+                    server.SendTo(Encoding.ASCII.GetBytes(line), line.Length, SocketFlags.None, remoteEp);
+                    newLines.Remove(line);
+                    fileChanged = true;
+                }
+            }
+
+            if (fileChanged)
+            {
+                using StreamWriter sw = File.CreateText(path);
+                foreach (var line in newLines)
+                {
+                    sw.WriteLine(line);
                 }
             }
         }

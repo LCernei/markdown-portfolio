@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
@@ -52,7 +53,29 @@ namespace PubSubServer
                             server.SendTo(Encoding.ASCII.GetBytes(message), message.Length, SocketFlags.None, endPoint);
                         }
                     }
+                    else
+                    {
+                        WriteToFile(message);
+                    }
                 }
+            }
+        }
+
+        private static void WriteToFile(string message)
+        {
+            string path = @"./tempdata.txt";
+            if (!File.Exists(path)) 
+            {
+                // Create a file to write to.
+                using (StreamWriter sw = File.CreateText(path)) 
+                {
+                    sw.WriteLine(message);
+                }
+                return;
+            }
+            using (StreamWriter sw = File.AppendText(path)) 
+            {
+                sw.WriteLine(message);
             }
         }
     }

@@ -9,7 +9,7 @@ namespace PubSubServer
         private static readonly Dictionary<string, List<EndPoint>> 
             _subscribersList = new Dictionary<string, List<EndPoint>>();
 
-        static public Dictionary<string, List<EndPoint>> SubscribersList
+        public static Dictionary<string, List<EndPoint>> SubscribersList
         {
             get { return _subscribersList; }
         }
@@ -37,6 +37,10 @@ namespace PubSubServer
             {
                 var newSubscribersList = new List<EndPoint> {subscriberEndPoint};
                 SubscribersList.Add(topicName, newSubscribersList);
+                
+                //get messages for topic from file
+                //publish these messages
+                //var server = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             }
         }
 
